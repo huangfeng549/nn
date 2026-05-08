@@ -2,6 +2,7 @@ import carla
 import time
 from spawn_car import create_vehicle
 from cruise_control import get_vehicle_speed, speed_cruise_control
+from obstacle_detect import check_front_obstacle
 
 def main():
     client = carla.Client('localhost', 2000)
@@ -12,14 +13,21 @@ def main():
     vehicle = None
     try:
         vehicle = create_vehicle(world, carla_map)
-        print("✅ 作业2：定速巡航功能启动")
+        print("✅ 作业3：障碍物检测功能启动")
         target_speed = 30
 
-        for _ in range(500):
+        for _ in range(600):
             world.tick()
             speed = get_vehicle_speed(vehicle)
-            throttle, brake = speed_cruise_control(speed, target_speed)
-            ctrl = carla.VehicleControl(throttle=throttle, brake=brake)
+            has_obstacle = check_front_obstacle(vehicle, world)
+            ctrl = carla.VehicleControl()
+
+            if has_obstacle:
+                ctrl.throttle = 0.0
+                ctrl.brake = 1.0
+            else:
+                ctrl.throttle, ctrl.brake = speed_cruise_control(speed, target_speed)
+
             vehicle.apply_control(ctrl)
             time.sleep(0.05)
     finally:
