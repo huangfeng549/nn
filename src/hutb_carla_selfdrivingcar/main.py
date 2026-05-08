@@ -9,6 +9,7 @@ from emergency_brake import emergency_brake_logic
 from turn_light import auto_turn_light_tip
 from safe_distance import monitor_safe_distance
 from parking_assist import parking_assist_tip
+from system_total import print_system_info
 
 def main():
     client = carla.Client('localhost', 2000)
@@ -19,10 +20,10 @@ def main():
     vehicle = None
     try:
         vehicle = create_vehicle(world, carla_map)
-        print("✅ 作业9：泊车辅助场景提示功能启动")
+        print_system_info()
         base_speed = 30
 
-        for _ in range(1300):
+        for _ in range(1500):
             world.tick()
             speed = get_vehicle_speed(vehicle)
             has_obstacle = check_front_obstacle(vehicle, world)
