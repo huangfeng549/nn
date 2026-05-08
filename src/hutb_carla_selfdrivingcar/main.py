@@ -6,6 +6,7 @@ from obstacle_detect import check_front_obstacle
 from lane_keep import calc_lane_steer
 from speed_limit import get_road_speed_limit
 from emergency_brake import emergency_brake_logic
+from turn_light import auto_turn_light_tip
 
 def main():
     client = carla.Client('localhost', 2000)
@@ -16,10 +17,10 @@ def main():
     vehicle = None
     try:
         vehicle = create_vehicle(world, carla_map)
-        print("✅ 作业6：自动紧急刹车功能启动")
+        print("✅ 作业7：自动转向灯提示功能启动")
         base_speed = 30
 
-        for _ in range(1000):
+        for _ in range(1100):
             world.tick()
             speed = get_vehicle_speed(vehicle)
             has_obstacle = check_front_obstacle(vehicle, world)
@@ -27,6 +28,7 @@ def main():
             road_limit = get_road_speed_limit()
             target_speed = min(base_speed, road_limit)
 
+            auto_turn_light_tip(steer_angle)
             ctrl = carla.VehicleControl()
             brake_cmd = emergency_brake_logic(has_obstacle)
             if brake_cmd:
