@@ -5,6 +5,7 @@ from cruise_control import get_vehicle_speed, speed_cruise_control
 from obstacle_detect import check_front_obstacle
 from lane_keep import calc_lane_steer
 from speed_limit import get_road_speed_limit
+from emergency_brake import emergency_brake_logic
 
 def main():
     client = carla.Client('localhost', 2000)
@@ -15,10 +16,10 @@ def main():
     vehicle = None
     try:
         vehicle = create_vehicle(world, carla_map)
-        print("✅ 作业5：道路限速控制功能启动")
+        print("✅ 作业6：自动紧急刹车功能启动")
         base_speed = 30
 
-        for _ in range(900):
+        for _ in range(1000):
             world.tick()
             speed = get_vehicle_speed(vehicle)
             has_obstacle = check_front_obstacle(vehicle, world)
@@ -27,9 +28,9 @@ def main():
             target_speed = min(base_speed, road_limit)
 
             ctrl = carla.VehicleControl()
-            if has_obstacle:
-                ctrl.throttle = 0.0
-                ctrl.brake = 1.0
+            brake_cmd = emergency_brake_logic(has_obstacle)
+            if brake_cmd:
+                ctrl.throttle, ctrl.brake = brake_cmd
             else:
                 ctrl.throttle, ctrl.brake = speed_cruise_control(speed, target_speed)
 
