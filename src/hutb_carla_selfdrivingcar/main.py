@@ -3,6 +3,7 @@ import time
 from spawn_car import create_vehicle
 from cruise_control import get_vehicle_speed, speed_cruise_control
 from obstacle_detect import check_front_obstacle
+from lane_keep import calc_lane_steer
 
 def main():
     client = carla.Client('localhost', 2000)
@@ -13,13 +14,14 @@ def main():
     vehicle = None
     try:
         vehicle = create_vehicle(world, carla_map)
-        print("✅ 作业3：障碍物检测功能启动")
+        print("✅ 作业4：车道保持功能启动")
         target_speed = 30
 
-        for _ in range(600):
+        for _ in range(800):
             world.tick()
             speed = get_vehicle_speed(vehicle)
             has_obstacle = check_front_obstacle(vehicle, world)
+            steer_angle = calc_lane_steer(vehicle, carla_map)
             ctrl = carla.VehicleControl()
 
             if has_obstacle:
@@ -28,6 +30,7 @@ def main():
             else:
                 ctrl.throttle, ctrl.brake = speed_cruise_control(speed, target_speed)
 
+            ctrl.steer = steer_angle
             vehicle.apply_control(ctrl)
             time.sleep(0.05)
     finally:
